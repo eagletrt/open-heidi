@@ -12,7 +12,7 @@ int main() {
   std::string client_id = "c3363912f2d069ed92e4b4b63612f4da";
   std::vector<std::string> scopes = {"openid", "email", "profile", "offline_access"};
  
-  auto response = device_flow_init(url, client_id, scopes);
+  auto response = request_device_flow_init(url, client_id, scopes);
 
   std::cout << response.body["user_code"] << std::endl;
 }

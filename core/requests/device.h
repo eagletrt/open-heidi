@@ -7,7 +7,7 @@
 #include <curl/curl.h>
 
 response_t
-device_flow_init(
+request_device_flow_init(
   const std::string &url,
   const std::string &client_id,
   const std::vector<std::string> &scopes
