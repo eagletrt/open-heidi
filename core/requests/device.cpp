@@ -1,5 +1,6 @@
 #include "device.h"
 
+static
 size_t
 _write_callback(
   char *ptr,

@@ -11,7 +11,12 @@ include_directories(${CURL_INCLUDE_DIRS})
 
 include_directories(core/requests)
 
-add_executable(OpenHeidi core/main.cpp core/requests/device.cpp)
+add_executable(
+  OpenHeidi 
+  core/main.cpp 
+  core/requests/openid_configuration.cpp
+  core/requests/device.cpp
+)
 target_link_libraries(OpenHeidi PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(OpenHeidi PRIVATE ${CURL_LIBRARIES})
 
