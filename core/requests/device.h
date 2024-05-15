@@ -3,6 +3,8 @@
 
 #include "requests.h"
 #include <nlohmann/json.hpp>
+#include <iostream>
+#include <curl/curl.h>
 
 response_t
 device_flow_init(
