@@ -43,6 +43,34 @@ int main() {
     );
   } while (token_response.code != 200);
 
-  std::cout << std::string(token_response.body["access_token"]) << std::endl;
+  std::cout << "User authenticated!" << std::endl;
+
+  response_t refresh_response;
+  size_t token_expiration = token_response.body["expires_in"];
+  
+  do {
+    sleep(token_expiration - 10);
+
+    refresh_flow_params_t refresh_params {
+      std::string(token_response.body["refresh_token"])
+    };
+
+    refresh_response = request_token(
+      std::string(discovery_response.body["token_endpoint"]),
+      client_id,
+      refresh_params
+    );
+
+    if (refresh_response.code == 200) {
+      std::cout << "Token refreshed!" << std::endl;
+      token_response = refresh_response;
+      token_expiration = token_response.body["expires_in"];
+    } 
+
+  } while (refresh_response.code == 200);
+
+  std::cout << refresh_response.body << std::endl;
+
+  std::cout << "Token expired!" << std::endl;
 }
 

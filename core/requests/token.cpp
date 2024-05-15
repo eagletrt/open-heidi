@@ -19,7 +19,7 @@ response_t
 request_token(
   const std::string &url,
   const std::string &client_id,
-  const std::variant<device_flow_params_t, password_flow_params_t> &params
+  const std::variant<device_flow_params_t, password_flow_params_t, refresh_flow_params_t> &params
 ) {
 
   size_t return_code;
@@ -45,6 +45,10 @@ request_token(
     post_str = "client_id=" + client_id + "&grant_type=password"
       + "&username=" + std::get<password_flow_params_t>(params).username
       + "&password=" + std::get<password_flow_params_t>(params).password;
+  }
+  else if (std::holds_alternative<refresh_flow_params_t>(params)) {
+    post_str = "client_id=" + client_id + "&grant_type=refresh_token"
+      + "&refresh_token=" + std::get<refresh_flow_params_t>(params).refresh_token;
   }
   else {
     return {0, body};

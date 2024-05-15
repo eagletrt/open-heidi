@@ -15,11 +15,15 @@ struct password_flow_params_t {
   std::string password;
 };
 
+struct refresh_flow_params_t {
+  std::string refresh_token;
+};
+
 response_t
 request_token(
   const std::string &url,
   const std::string &client_id,
-  const std::variant<device_flow_params_t, password_flow_params_t> &params
+  const std::variant<device_flow_params_t, password_flow_params_t, refresh_flow_params_t> &params
 );
 
 #endif // !REQUESTS_TOKEN_H
