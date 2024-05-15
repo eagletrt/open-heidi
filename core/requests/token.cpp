@@ -19,7 +19,7 @@ response_t
 request_token(
   const std::string &url,
   const std::string &client_id,
-  const std::variant<device_flow_params_t> &params
+  const std::variant<device_flow_params_t, password_flow_params_t> &params
 ) {
 
   size_t return_code;
@@ -38,7 +38,13 @@ request_token(
   std::string post_str;
 
   if (std::holds_alternative<device_flow_params_t>(params)) {
-    post_str = "client_id=" + client_id + "&grant_type=urn:ietf:params:oauth:grant-type:device_code&device_code=" + std::get<device_flow_params_t>(params).device_code;
+    post_str = "client_id=" + client_id + "&grant_type=urn:ietf:params:oauth:grant-type:device_code"
+      + "&device_code=" + std::get<device_flow_params_t>(params).device_code;
+  } 
+  else if (std::holds_alternative<password_flow_params_t>(params)) {
+    post_str = "client_id=" + client_id + "&grant_type=password"
+      + "&username=" + std::get<password_flow_params_t>(params).username
+      + "&password=" + std::get<password_flow_params_t>(params).password;
   }
   else {
     return {0, body};
