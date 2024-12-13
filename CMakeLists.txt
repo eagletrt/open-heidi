@@ -3,8 +3,12 @@ project(OpenHeidi)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+add_compile_options(-stdlib=libc++)
 
 add_subdirectory(external/json)
+add_subdirectory(external/cpp-httplib)
 
 find_package(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIRS})
@@ -12,8 +16,9 @@ include_directories(${CURL_INCLUDE_DIRS})
 include_directories(core/requests)
 
 add_executable(
-  OpenHeidi 
-  core/main.cpp 
+  OpenHeidi
+  core/main.cpp
+  core/server.cpp
   core/requests/device.cpp
   core/requests/openid_configuration.cpp
   core/requests/token.cpp
