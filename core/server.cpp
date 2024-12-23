@@ -1,8 +1,10 @@
 #include "server.h"
 
-#include <unistd.h>
+AuthCallbackServer::AuthCallbackServer(const std::string &client_id) {
+  this->client_id = std::string(client_id);
+  this->redirect_uri = "http://localhost:8080/callback";
+  this->state = std::format("{:x}", random_int());
 
-AuthCallbackServer::AuthCallbackServer() {
   if (!this->srv.is_valid()) {
     std::cerr << "Server has an invalid configuration" << std::endl;
     throw std::exception();
@@ -17,6 +19,12 @@ AuthCallbackServer::AuthCallbackServer() {
           return;
         }
 
+        if (state != req.get_param_value("state")) {
+          res.set_content("Invalid state", "text/plain");
+          res.status = httplib::StatusCode::BadRequest_400;
+          return;
+        }
+
         this->response = CallbackResponse{req.get_param_value("scope"),
                                           req.get_param_value("state"),
                                           req.get_param_value("code")};
@@ -26,7 +34,7 @@ AuthCallbackServer::AuthCallbackServer() {
       });
 }
 
-void AuthCallbackServer::start() {
+std::string AuthCallbackServer::start() {
   this->server_thread = std::thread([this] {
     try {
       this->srv.listen("localhost", 8080);
@@ -35,6 +43,16 @@ void AuthCallbackServer::start() {
       std::cerr << e.what() << std::endl;
     }
   });
+
+  return std::format(
+      "https://accounts.google.com/o/oauth2/v2/auth?"
+      "client_id={}&"
+      "redirect_uri={}&"
+      "scope=openid%20profile%20email&"
+      "response_type=code&"
+      "state={}&"
+      "hd=eagletrt.it",
+      client_id, redirect_uri, state);
 }
 
 void AuthCallbackServer::stop() {
@@ -52,4 +70,11 @@ CallbackResponse AuthCallbackServer::wait_response(int timeout) {
     throw std::exception();
   }
   return this->response.value();
+}
+
+int AuthCallbackServer::random_int() {
+  static thread_local std::mt19937 generator;
+  std::uniform_int_distribution<uint64_t> distribution(
+      0, std::numeric_limits<std::uint64_t>::max());
+  return distribution(generator);
 }

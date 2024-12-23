@@ -2,6 +2,7 @@
 #include <unistd.h>
 
 #include <cstdlib>
+#include <format>
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <string>
@@ -81,21 +82,35 @@ int main() {
   std::shared_ptr<CallbackResponse> ptr =
       std::make_shared<CallbackResponse>(params);
 
-  AuthCallbackServer srv;
-  srv.start();
+  std::string client_id =
+      "63544120325-iheof77sq00leincpqpsh6ude30slcf1.apps.googleusercontent.com";
 
-  system(
-      "open \"https://accounts.google.com/o/oauth2/v2/"
-      "auth?client_id=63544120325-1qlcbqe6riugunpn0p29dfnulq6esera."
-      "apps.googleusercontent.com&redirect_uri=http://localhost:8080/"
-      "callback&scope=openid%20profile%20email&response_type=code&"
-      "state=0bbe370cdb9e9dd8852660c05efdfc112a8c2cda\"");
+  AuthCallbackServer srv(client_id);
+  std::string url = srv.start();
+
+  std::string command = std::format("open \"{}\"", url);
+
+  std::cout << "Using command \"" << command << "\"" << std::endl;
+
+  system(command.c_str());
 
   std::cout << "Server started" << std::endl;
 
-  CallbackResponse response = srv.wait_response(10);
+  CallbackResponse response;
+  try {
+    response = srv.wait_response(10);
+  } catch (const std::exception &e) {
+    std::cerr << e.what() << std::endl;
+    srv.stop();
+    return 1;
+  }
 
   srv.stop();
+
+  std::cout << "Response received" << std::endl;
+  std::cout << "Scope: " << response.scope << std::endl;
+  std::cout << "State: " << response.state << std::endl;
+  std::cout << "Code: " << response.code << std::endl;
 
   std::cout << "Server stopped" << std::endl;
 }

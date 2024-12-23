@@ -22,9 +22,15 @@ class AuthCallbackServer {
   std::mutex lock;
   std::condition_variable cv;
 
+  std::string client_id;
+  std::string redirect_uri;
+  std::string state;
+
+  static int random_int();
+
  public:
-  AuthCallbackServer();
-  void start();
+  AuthCallbackServer(const std::string &client_id);
+  std::string start();
   void stop();
   bool is_running();
   CallbackResponse wait_response(int timeout);
