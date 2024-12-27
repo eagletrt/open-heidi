@@ -48,8 +48,10 @@ std::string AuthCallbackServer::start() {
       "https://accounts.google.com/o/oauth2/v2/auth?"
       "client_id={}&"
       "redirect_uri={}&"
-      "scope=openid%20profile%20email&"
+      "scope=openid%20profile%20email&offline_access&"
       "response_type=code&"
+      "prompt=consent&"
+      "access_type=offline&"
       "state={}&"
       "hd=eagletrt.it",
       client_id, redirect_uri, state);
