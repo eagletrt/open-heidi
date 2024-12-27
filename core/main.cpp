@@ -119,11 +119,22 @@ int main() {
 
   if (tokens.has_value()) {
     std::cout << "Access token: " << tokens.value().access_token << std::endl;
+    std::cout << "ID token: " << tokens.value().id_token << std::endl;
     std::cout << "Token type: " << tokens.value().token_type << std::endl;
     std::cout << "Refresh token: " << tokens.value().refresh_token << std::endl;
     std::cout << "Expires in: " << tokens.value().expires_in << std::endl;
     std::cout << "Scope: " << tokens.value().scope << std::endl;
   } else {
     std::cerr << "Error: could not get tokens" << std::endl;
+  }
+
+  std::optional<refresh_token_endpoint_body_t> refresh_tokens = refresh_token(
+      "http://localhost:8081", "/oauth/refresh", tokens.value().refresh_token);
+
+  if (refresh_tokens.has_value()) {
+    std::cout << "Refreshed access token: "
+              << refresh_tokens.value().access_token << std::endl;
+  } else {
+    std::cerr << "Error: could not refresh tokens" << std::endl;
   }
 }
