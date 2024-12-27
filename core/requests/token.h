@@ -1,29 +1,18 @@
 #ifndef REQUESTS_TOKEN_H
 #define REQUESTS_TOKEN_H
 
-#include "requests.h"
 #include <nlohmann/json.hpp>
-#include <iostream>
-#include <curl/curl.h>
+#include <optional>
 
-struct device_flow_params_t {
-  std::string device_code;
-};
-
-struct password_flow_params_t {
-  std::string username;
-  std::string password;
-};
-
-struct refresh_flow_params_t {
+struct auth_token_endpoint_body_t {
+  std::string access_token;
+  std::string token_type;
   std::string refresh_token;
+  size_t expires_in;
+  std::string scope;
 };
 
-response_t
-request_token(
-  const std::string &url,
-  const std::string &client_id,
-  const std::variant<device_flow_params_t, password_flow_params_t, refresh_flow_params_t> &params
-);
+std::optional<auth_token_endpoint_body_t> request_token(
+    const std::string &host, const std::string &path, const std::string &code);
 
-#endif // !REQUESTS_TOKEN_H
+#endif  // !REQUESTS_TOKEN_H

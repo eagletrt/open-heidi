@@ -5,6 +5,7 @@
 #include <format>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include <optional>
 #include <string>
 
 #include "requests/device.h"
@@ -106,11 +107,23 @@ int main() {
   }
 
   srv.stop();
+  std::cout << "Server stopped" << std::endl;
 
   std::cout << "Response received" << std::endl;
   std::cout << "Scope: " << response.scope << std::endl;
   std::cout << "State: " << response.state << std::endl;
   std::cout << "Code: " << response.code << std::endl;
 
-  std::cout << "Server stopped" << std::endl;
+  std::optional<auth_token_endpoint_body_t> tokens =
+      request_token("http://localhost:8081", "/oauth/token", response.code);
+
+  if (tokens.has_value()) {
+    std::cout << "Access token: " << tokens.value().access_token << std::endl;
+    std::cout << "Token type: " << tokens.value().token_type << std::endl;
+    std::cout << "Refresh token: " << tokens.value().refresh_token << std::endl;
+    std::cout << "Expires in: " << tokens.value().expires_in << std::endl;
+    std::cout << "Scope: " << tokens.value().scope << std::endl;
+  } else {
+    std::cerr << "Error: could not get tokens" << std::endl;
+  }
 }
